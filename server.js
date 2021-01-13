@@ -4,7 +4,7 @@ import cors from 'cors';
 
 import mountRouter from './routes/index.js';
 
-const port = 3000; // tmp port 4 production
+const port = 1000; // tmp port 4 production
 const app = express();
 
 app.use(express.json());

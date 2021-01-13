@@ -93,6 +93,30 @@ class UsersController {
             console.log(err.message);
         }
     } 
+
+    login = async (req, res) => {
+        try{
+            const { email, password } = req.body;
+            const user = await pool.query(SQL`
+                SELECT * FROM uzytkownik 
+                WHERE email=${email} AND haslo=${password};`
+            );
+
+            if(user.rows.length === 0){
+                return res.status(400).send("Nie znaleziono użytkownika.");
+            }
+
+            const userMapped = {
+                id : user.rows[0].id,
+                isAdmin : user.rows[0].typ === 'admin',
+                name : user.rows[0].imie,
+            };
+            res.status(200).send(userMapped);
+
+        }catch(err){
+            console.log(err.message);
+        }
+    }
 }
 
 const usersController = new UsersController();

@@ -3,12 +3,13 @@ CREATE TYPE "typ_uzytkownia" AS ENUM (
   'klient'
 );
 
-CREATE TYPE "stan_zamowienia" AS ENUM (
+CREATE TYPE "status_zamowienia" AS ENUM (
   'nowe',
   'przyjete',
   'pakowane',
   'wyslane',
-  'zrealizowane'
+  'zrealizowane',
+  'anulowane'
 );
 
 CREATE TYPE "gwiazdki" AS ENUM (
@@ -41,19 +42,23 @@ CREATE TABLE "uzytkownik" (
   "haslo" varchar(50) NOT NULL
 );
 
-CREATE TABLE "status" (
+CREATE TABLE "status_platnosci" (
   "id" SERIAL PRIMARY KEY,
-  "stan" stan_zamowienia DEFAULT 'nowe',
-  "uwagi" varchar DEFAULT null
+  "zamowienie_id" int,
+  "czy_zaplacone" boolean NOT NULL,
+  "typ_platnosci" varchar NOT NULL,
+  "tytul" varchar
 );
 
 CREATE TABLE "zamowienie" (
   "id" SERIAL PRIMARY KEY,
   "uzytkownik_id" int,
-  "status_id" int,
   "adres_id" int,
+  "status" status_zamowienia DEFAULT 'nowe',
   "data_utworzenia" timestamp DEFAULT (now()),
   "data_zrealizowania" timestamp DEFAULT null,
+  "koszt_produktow" float NOT NULL,
+  "koszt_dostawy" float NOT NULL,
   "uwagi_klienta" varchar DEFAULT null
 );
 
@@ -74,8 +79,8 @@ CREATE TABLE "serwis" (
 
 CREATE TABLE "kategoria_produktu" (
   "id" SERIAL PRIMARY KEY,
-  "kategoria" varchar(50) NOT NULL,
-  "grupa" varchar(50) NOT NULL
+  "nazwa" varchar(50) NOT NULL,
+  "typ" varchar(50) NOT NULL
 );
 
 CREATE TABLE "produkt" (
@@ -107,9 +112,9 @@ CREATE TABLE "promocja" (
 
 ALTER TABLE "adres" ADD FOREIGN KEY ("uzytkownik_id") REFERENCES "uzytkownik" ("id");
 
-ALTER TABLE "zamowienie" ADD FOREIGN KEY ("uzytkownik_id") REFERENCES "uzytkownik" ("id");
+ALTER TABLE "status_platnosci" ADD FOREIGN KEY ("zamowienie_id") REFERENCES "zamowienie" ("id");
 
-ALTER TABLE "zamowienie" ADD FOREIGN KEY ("status_id") REFERENCES "status" ("id");
+ALTER TABLE "zamowienie" ADD FOREIGN KEY ("uzytkownik_id") REFERENCES "uzytkownik" ("id");
 
 ALTER TABLE "zamowienie" ADD FOREIGN KEY ("adres_id") REFERENCES "adres" ("id");
 
@@ -125,4 +130,4 @@ ALTER TABLE "produkt" ADD FOREIGN KEY ("kategoria") REFERENCES "kategoria_produk
 
 ALTER TABLE "opinia" ADD FOREIGN KEY ("produkt_id") REFERENCES "produkt" ("id");
 
-ALTER TABLE "opinia" ADD FOREIGN KEY ("autor") REFERENCES "uzytkownik" ("id");
+ALTER TABLE "opinia" ADD FOREIGN KEY ("autor_id") REFERENCES "uzytkownik" ("id");
