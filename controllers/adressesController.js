@@ -62,7 +62,13 @@ class AdressesController {
                     nr_budynku,
                     nr_lokalu)
                 VALUES
-                    (${userId}, ${country}, ${postcode}, ${city}, ${street}, ${building}, ${apartment})
+                    (   ${userId}, 
+                        ${country}, 
+                        ${postcode}, 
+                        ${city}, 
+                        ${street}, 
+                        ${building}, 
+                        ${apartment}    )
                     RETURNING id;`
             );
         
@@ -79,7 +85,12 @@ class AdressesController {
             
             await pool.query(SQL`
                 UPDATE adres 
-                SET panstwo=${country}, kod_pocztowy=${postcode}, miejscowosc=${city}, ulica=${street}, nr_budynku=${building}, nr_lokalu=${apartment}
+                SET panstwo=${country}, 
+                    kod_pocztowy=${postcode}, 
+                    miejscowosc=${city}, 
+                    ulica=${street}, 
+                    nr_budynku=${building}, 
+                    nr_lokalu=${apartment}
                 WHERE id = ${addressId}`
             );
 

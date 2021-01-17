@@ -3,12 +3,14 @@ VALUES
     ('klient', 'Adrian', 'Fórman', 'forman@email.com', '+48222456789', '123456'),
     ('klient', 'Roman', 'Jarosiński', 'jarosinski@email.com', '+48222456719', '123456'),
     ('admin', 'Kasia', 'Jasia', 'jasia@email.com', '+48222456719', 'admin'),
-    ('admin', 'Jan', 'Kowalski', 'kowalski@email.com', '+48322456719', 'admin');
+    ('admin', 'Jan', 'Kowalski', 'kowalski@email.com', '+48322456719', 'admin'),
+    ('klient', 'Janusz', 'Kowalski', 'k2owalski@email.com', '+48322456739', 'klient'),
+    ('admin', 'Jan', 'Długosz', 'a@a.com', '+48322456719', 'a');
 
 INSERT INTO promocja(nazwa, opis, znizka) 
 VALUES
-    ('ŚWIĘTA', 'Cyber święta z CyberShop już teraz! Tniemy ceny na maksa!', 0.80),
-    ('Tydzień smartfonów Xiaomi', 'Przenieś się w nowy wymiar z nowym smartfonem Xiaomi', 0.70);
+    ('ŚWIĘTA', 'Cyber święta z CyberShop już teraz! Tniemy ceny na maksa!', 0.20),
+    ('Tydzień smartfonów Xiaomi', 'Przenieś się w nowy wymiar z nowym smartfonem Xiaomi', 0.30);
 
 INSERT INTO kategoria_produktu(nazwa, typ)
 VALUES 
@@ -33,10 +35,11 @@ INSERT INTO produkt(
     kategoria)
 VALUES 
     ('Apple iPhone 12‌ mini 128GB (czerwony)', 'Dzwoni', 4799, 'Apple', 12, 131, 2,1),
-
     ('Xiaomi Redmi Note 10 Pro', 'Dzwoni', 799, 'Xiaomi', 24, 999, 2,1),
-    
-    ('Apple Watch 3 38mm biały', 'Wyświetla godzinę', 9999, 'Apple', 12, 123, null, 2);
+    ('Apple Watch 3 38mm biały', 'Wyświetla godzinę', 9999, 'Apple', 12, 123, null, 2),
+    ('TestItem1', 'testuje1', 7499, 'Testex1', 12, 399, 2,1),
+    ('TestItem2', 'testuje2', 729, 'Testex2', 24, 949, 1,2),
+    ('TestItem3', 'testuje3', 759, 'Testex3', 24, 959, 2,4);
 
 INSERT INTO adres( 
     uzytkownik_id,
@@ -82,7 +85,7 @@ INSERT INTO pozycja_zamowienia(
 VALUES
     (1, 1, 5),
     (1, 2, 2),
-    (2, 3, 1)
+    (2, 3, 1),
     (3, 1, 2),
     (3, 2, 3),
     (4, 3, 2);
@@ -98,7 +101,13 @@ VALUES
     ('4', '', 2, 2),
     ('1', '', 2, 3),
     ('4', '', 2, 4),
-    ('2', '', 1, 1);
+    ('2', '', 1, 1),
+    ('5', 'Test Kom', 4, 1),
+    ('3', 'Test Kom.', 4, 2),
+    ('4', 'test Kom', 5, 2),
+    ('1', 'test Kom', 5, 3),
+    ('4', 'test Kom', 6, 4),
+    ('2', 'test Kom', 6, 1);;
 
 INSERT INTO serwis(pozycja_zamowienia_id, opis_usterki, status, ilosc)
 VALUES

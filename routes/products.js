@@ -4,11 +4,14 @@ import productsController from '../controllers/productsController.js';
 const { Router } = express;
 const productsRouter = Router();
 
-productsRouter.get('/', productsController.getAllProducts);
-productsRouter.get('/:categoryId', productsController.getProductsByCategoryName);
-// usersRouter.post('/', usersController.createUser);
-// usersRouter.put('/:id', usersController.updateUser);
-// usersRouter.delete('/:id', usersController.deleteUser);
+productsRouter.get('/names', productsController.getAllProductsNames);
+productsRouter.get('/category/:id', productsController.getProductsByCategoryId);
+productsRouter.get('/recommended', productsController.getRecommendedProducts);
+productsRouter.get('/promo/:id', productsController.getProductsByPromoId);
+productsRouter.put('/create', productsController.createProduct);
+productsRouter.post('/update/:id', productsController.updateProduct);
+productsRouter.delete('/delete/:id', productsController.deleteProduct);
+
 
 
 export default productsRouter;

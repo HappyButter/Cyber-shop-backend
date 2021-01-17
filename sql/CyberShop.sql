@@ -88,6 +88,8 @@ CREATE TABLE "produkt" (
   "nazwa" varchar NOT NULL,
   "opis" varchar,
   "cena" float NOT NULL,
+  "cena_promo" float DEFAULT null,
+  "srednia_ocena" float DEFAULT null,
   "producent" varchar NOT NULL,
   "okres_gwarancji" int NOT NULL,
   "stan_magazynu" int DEFAULT 0,
@@ -97,6 +99,7 @@ CREATE TABLE "produkt" (
 
 CREATE TABLE "opinia" (
   "id" SERIAL PRIMARY KEY,
+  "nick" varchar(20),
   "gwiazdki" gwiazdki NOT NULL,
   "tresc" varchar,
   "produkt_id" int,
