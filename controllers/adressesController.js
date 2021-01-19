@@ -1,5 +1,6 @@
 import pool from '../db/db.js';
 import sqlTemplate from 'sql-template-strings';
+import adressesService from '../services/adressesService.js';
 
 const {SQL} = sqlTemplate;
 
@@ -50,29 +51,9 @@ class AdressesController {
 
     createAddress = async (req, res) => {
         try{
-            const {userId, country, postcode, city, street, building, apartment} = req.body;
+            const newAddressID = await adressesService.createAddress(req.body);
 
-            const newAddressID = await pool.query(SQL`
-                INSERT INTO adres( 
-                    uzytkownik_id,
-                    panstwo,
-                    kod_pocztowy,
-                    miejscowosc,
-                    ulica,
-                    nr_budynku,
-                    nr_lokalu)
-                VALUES
-                    (   ${userId}, 
-                        ${country}, 
-                        ${postcode}, 
-                        ${city}, 
-                        ${street}, 
-                        ${building}, 
-                        ${apartment}    )
-                    RETURNING id;`
-            );
-        
-            res.status(201).send(`Address added with ID: ${newAddressID.rows[0].id}`);
+            res.status(201).send(`Address added with ID: ${newAddressID}`);
         }catch(err){
             console.log(err.message);
         }

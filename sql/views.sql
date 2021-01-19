@@ -45,7 +45,7 @@ CREATE VIEW produkt_pelne_info AS
 DROP VIEW IF EXISTS rekomendowane;
 
 CREATE VIEW rekomendowane AS
-    SELECT ppi.* FROM produkt_pelne_info ppi 
+    SELECT id, nazwa, cena, cena_promo, srednia_ocena, producent, stan_magazynu, promocja, kategoria, nazwa_kategorii, typ  FROM produkt_pelne_info
     ORDER BY srednia_ocena LIMIT 6; 
 
 

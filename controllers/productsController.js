@@ -9,6 +9,20 @@ const categoriesEnum = {
     3 : 'Podzespoły komputerowe'        
 }
 class ProductsController {
+    mapProductShort = (product) => {
+        return {
+            id: product.id,
+            name: product.nazwa,
+            price: product.cena,
+            promo_price: product.cena_promo,
+            rating: product.srednia_ocena,
+            inStock: product.stan_magazynu,
+            promo_id: product.promocja,
+            category_id: product.kategoria,
+            category_name: product.nazwa_kategorii,
+            category_group: product.typ,
+        }
+    }
 
     mapProduct = (product) => {
         return {
@@ -24,7 +38,7 @@ class ProductsController {
             promo_id: product.promocja,
             category_id: product.kategoria,
             category_name: product.nazwa_kategorii,
-            category_group: product.typ, 
+            category_group: product.typ,
         }
     }
 
@@ -33,9 +47,9 @@ class ProductsController {
             const products = await pool.query(SQL`
                 select * from rekomendowane;
             `);
-            const productsMapped = products.rows.map(this.mapProduct);
-            res.status(200).json(productsMapped);
+            const productsMapped = products.rows.map(this.mapProductShort);
 
+            res.status(200).json(productsMapped);
         }catch(err) {
             console.log(err.message);
         }
@@ -47,6 +61,7 @@ class ProductsController {
                 SELECT *
                 FROM wszystkie_nazwy_produktow;`
             );
+            
             const allProductsMapped = allProductsNames.rows.map((product) => ({ 
                 name: product.nazwa 
             }));
@@ -59,15 +74,15 @@ class ProductsController {
 
     getProductsByCategoryId = async (req, res) => {        
         try{
-            const categoryId = parseInt(req.params.categoryId);
+            const categoryId = parseInt(req.params.id);
             const categoryName = categoriesEnum[categoryId];
-           
+
             const products = await pool.query(SQL`
                 SELECT * FROM produkt_pelne_info
                 WHERE nazwa_kategorii=${categoryName};
             `);
 
-            const productsMapped = products.rows.map(this.mapProduct);
+            const productsMapped = products.rows.map(this.mapProductShort);
             res.status(200).json(productsMapped);
         }catch(err){
             console.log(err.message);
@@ -77,14 +92,29 @@ class ProductsController {
     getProductsByPromoId = async (req, res) => {
         try {
             const promoId = parseInt(req.params.id);
-            const products = pool.query(SQL`
+            const products = await pool.query(SQL`
                 SELECT * FROM produkt_pelne_info
-                WHERE promocja_id=${promoId};
+                WHERE promocja=${promoId};
             `);
 
-            const productsMapped = products.rows.map(this.mapProduct);
+            const productsMapped = products.rows.map(this.mapProductShort);
+            res.status(200).json(productsMapped);
+        }catch(err){
+            console.log(err.message);
+        }
+    }
 
-            res.send(200).json(productsMapped);
+    getProductById = async (req, res) => {
+        try {
+            const productId = parseInt(req.params.id);
+            const product = await pool.query(SQL`
+                SELECT * FROM produkt_pelne_info
+                WHERE id=${productId};
+            `);
+
+            const productMapped = product.rows.map(this.mapProduct);
+
+            res.status(200).json(productMapped);
         }catch(err){
             console.log(err.message);
         }

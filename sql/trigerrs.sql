@@ -46,7 +46,6 @@ CREATE OR REPLACE FUNCTION promocja_update_cena()
 RETURNS trigger AS $$
 BEGIN
     IF NEW.znizka < 0.0 OR NEW.znizka > 0.99 THEN
-        RAISE EXCEPTION 'Niepoprawna wartość zniżki.';
         IF OLD IS NOT NULL THEN
             RETURN OLD;
         END IF;

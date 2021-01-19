@@ -4,6 +4,7 @@ import productsController from '../controllers/productsController.js';
 const { Router } = express;
 const productsRouter = Router();
 
+productsRouter.get('/details/:id', productsController.getProductById);
 productsRouter.get('/names', productsController.getAllProductsNames);
 productsRouter.get('/category/:id', productsController.getProductsByCategoryId);
 productsRouter.get('/recommended', productsController.getRecommendedProducts);

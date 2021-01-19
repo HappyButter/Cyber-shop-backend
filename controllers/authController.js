@@ -19,7 +19,9 @@ class AuthController {
 
             const newUser = { 
                 id : user.rows[0].id,
-                name : user.rows[0].imie
+                name : user.rows[0].imie,
+                surname : user.rows[0].nazwisko,
+                phoneNumber : user.rows[0].telefon
             }
 
             res.status(201).json(newUser);
@@ -43,9 +45,11 @@ class AuthController {
             }
 
             const userMapped = {
-                id : user.rows[0].id,
                 isAdmin : user.rows[0].typ === 'admin',
+                id : user.rows[0].id,
                 name : user.rows[0].imie,
+                surname : user.rows[0].nazwisko,
+                phoneNumber : user.rows[0].telefon
             };
             res.status(200).send(userMapped);
 

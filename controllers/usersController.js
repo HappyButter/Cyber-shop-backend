@@ -49,11 +49,13 @@ class UsersController {
     updateUser = async (req, res) => {
         try{
             const id = parseInt(req.params.id);
-            const {name, surname, email, phoneNumber} = req.body;
+            const {name, surname, phoneNumber} = req.body;
             
             await pool.query(SQL`
                 UPDATE uzytkownik 
-                SET imie=${name}, nazwisko = ${surname}, email = ${email}, telefon=${phoneNumber} 
+                SET imie=${name},
+                    nazwisko = ${surname},
+                    telefon=${phoneNumber} 
                 WHERE id = ${id}`
             );
 
