@@ -6,7 +6,7 @@ const {SQL} = sqlTemplate;
 class OrdersService {
     createOrder = async ( orderData, client = pool ) => {
         try{
-            const { userId, adressId, productsCost, shipmentPrice, clientComments } = orderData;
+            const { userId, addressId, productsCost, shipmentPrice, clientComments } = orderData;
 
             const newOrderId = await client.query(SQL`
                 INSERT INTO zamowienie( 
@@ -17,7 +17,7 @@ class OrdersService {
                     uwagi_klienta)
                 VALUES
                     (   ${userId}, 
-                        ${adressId}, 
+                        ${addressId}, 
                         ${productsCost}, 
                         ${shipmentPrice}, 
                         ${clientComments}   )

@@ -65,7 +65,7 @@ class OrdersController {
             await client.query(SQL`BEGIN`);
 
             const newAddressId = await adressesService.createAddress(req.body, client);
-            const newOrderId = await ordersService.createOrder( {...req.body, adressId : newAddressId }, client);
+            const newOrderId = await ordersService.createOrder( {...req.body, addressId : newAddressId }, client);
             await ordersService.createPaymentStatus({...req.body, orderId : newOrderId }, client);
             
             const items = req.body.productsList;

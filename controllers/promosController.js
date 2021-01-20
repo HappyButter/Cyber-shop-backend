@@ -10,7 +10,7 @@ class PromosController {
             id: promo.id,
             title: promo.nazwa,
             description: promo.opis,
-            discount: promo.znizka, 
+            discount: parseFloat(promo.znizka), 
         }
     }
 
