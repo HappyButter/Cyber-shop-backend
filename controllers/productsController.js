@@ -4,8 +4,8 @@ import sqlTemplate from 'sql-template-strings';
 const {SQL} = sqlTemplate;
 
 const categoriesEnum = {
-    1 : 'Smartfony i smartwatche',
-    2 : 'Laptopy i komputery',
+    1 : 'Laptopy i komputery',
+    2 : 'Smartfony i smartwatche',
     3 : 'Podzespoły komputerowe'        
 }
 class ProductsController {

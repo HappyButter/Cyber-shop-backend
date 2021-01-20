@@ -10,7 +10,7 @@ class CommentsController {
             id: comment.id,
             nick: comment.nick,
             stars: comment.gwiazdki,
-            description: comment.opis,
+            description: comment.tresc,
             product_id: comment.produkt_id,
             author_id: comment.autor_id, 
         }
@@ -18,9 +18,9 @@ class CommentsController {
 
     getCommentsByProductId = async (req, res) => {
         try{
-            const productId = parseInt(req.paramsq.id); 
+            const productId = parseInt(req.params.id); 
             const comments = await pool.query(SQL`
-                SELECT * FROM opinie
+                SELECT * FROM opinia
                 WHERE produkt_id=${productId};`
             );
 
@@ -29,21 +29,25 @@ class CommentsController {
             res.status(200).json(commentsMapped);
 
         }catch(err) {
-            console.log(err.message);
+            console.log("tutaj");
+            console.log(err);
         }
     }
 
     createComment = async (req, res) => {
         try{
             const { nick, stars, description, productId, authorId } = req.body;
-            await pool.query(SQL`
+            const comment = await pool.query(SQL`
                 INSERT INTO opinia(nick, gwiazdki, tresc, produkt_id, autor_id) 
-                VALUES (${nick}, ${stars}, ${description}, ${productId}, ${authorId});
+                VALUES (${nick}, ${stars}, ${description}, ${productId}, ${authorId})
+                RETURNING *;
             `);
-            res.status(201).send('Komentarz dodany');
+
+            const commentMapped = comment.rows.map(this.mapComment);
+            res.status(201).json(commentMapped);
 
         }catch(err){
-            console.log(err.message);
+            console.log(err);
             return res.status(400).send("Niepoprawne dane.");
         }
     }
