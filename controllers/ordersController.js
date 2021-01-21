@@ -16,13 +16,13 @@ class OrdersController {
             datePlaced : order.data_utworzenia,
             dateFulfillment : order.date_zrealizowania,
             productsCost : order.koszt_produktow,
-            shipmentPrice : order.koszt_dostawy,
+            shippmentPrice : order.koszt_dostawy,
             clientComments : order.uwagi_klienta,
             isPaid : order.czy_zaplacone,
             paymentMethod : order.typ_platnosci,
             paymentTitle : order.tytul_platnosci,
             country : order.panstwo,
-            postalCode : order.kod_pocztowy,
+            postCode : order.kod_pocztowy,
             city : order.miejscowosc,
             street : order.ulica,
             building : order.nr_budynku,
@@ -63,19 +63,20 @@ class OrdersController {
         const client = await pool.connect();
         try{
             await client.query(SQL`BEGIN`);
+            console.log(req.body);
 
             const newAddressId = await adressesService.createAddress(req.body, client);
             const newOrderId = await ordersService.createOrder( {...req.body, addressId : newAddressId }, client);
             await ordersService.createPaymentStatus({...req.body, orderId : newOrderId }, client);
             
-            const items = req.body.productsList;
+            const items = req.body.productList;
             for(const product of items){
                 await ordersService.reduceProductQuantity(product, client);
                 await ordersService.createOrderItem({...product, orderId : newOrderId }, client);
             }
 
             await client.query('COMMIT');
-            res.status(201).send(`Utworzono zamowienie o id: ${newOrderId}`);
+            res.status(201).json({newOrderId});
         } catch(err) {
             await client.query('ROLLBACK');
             console.error(err);

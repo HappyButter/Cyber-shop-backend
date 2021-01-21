@@ -45,7 +45,7 @@ CREATE TABLE "uzytkownik" (
 CREATE TABLE "status_platnosci" (
   "id" SERIAL PRIMARY KEY,
   "zamowienie_id" int,
-  "czy_zaplacone" boolean NOT NULL,
+  "czy_zaplacone" boolean NOT NULL DEFAULT false,
   "typ_platnosci" varchar NOT NULL,
   "tytul" varchar
 );
