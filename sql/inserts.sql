@@ -28,18 +28,19 @@ INSERT INTO produkt(
     nazwa, 
     opis, 
     cena,
+    marza,
     producent,
     okres_gwarancji,
     stan_magazynu,
     promocja,
     kategoria)
 VALUES 
-    ('Apple iPhone 12‌ mini 128GB (czerwony)', 'Dzwoni', 4799, 'Apple', 12, 131, 2,1),
-    ('Xiaomi Redmi Note 10 Pro', 'Dzwoni', 799, 'Xiaomi', 24, 999, 2,1),
-    ('Apple Watch 3 38mm biały', 'Wyświetla godzinę', 9999, 'Apple', 12, 123, null, 2),
-    ('TestItem1', 'testuje1', 7499, 'Testex1', 12, 399, 2,1),
-    ('TestItem2', 'testuje2', 729, 'Testex2', 24, 949, 1,2),
-    ('TestItem3', 'testuje3', 759, 'Testex3', 24, 959, 2,4);
+    ('Apple iPhone 12‌ mini 128GB (czerwony)', 'Dzwoni', 4799, 0.2, 'Apple', 12, 131, 2,1),
+    ('Xiaomi Redmi Note 10 Pro', 'Dzwoni', 799, 0.2, 'Xiaomi', 24, 999, 2,1),
+    ('Apple Watch 3 38mm biały', 'Wyświetla godzinę', 9999, 0.2, 'Apple', 12, 123, null, 2),
+    ('TestItem1', 'testuje1', 7499, 0.2, 'Testex1', 12, 399, 2,1),
+    ('TestItem2', 'testuje2', 729, 0.2, 'Testex2', 24, 949, 1,2),
+    ('TestItem3', 'testuje3', 759, 0.2, 'Testex3', 24, 959, 2,4);
 
 INSERT INTO adres( 
     uzytkownik_id,
@@ -58,37 +59,38 @@ VALUES
 INSERT INTO zamowienie(
     uzytkownik_id,
     adres_id,
+    tytul,
     koszt_produktow,
     koszt_dostawy,
     uwagi_klienta)
 VALUES
-    (1, 1, 123, 15, 'Miłego dnia :)'),
-    (2, 2, 999, 12, ''),
-    (1, 3, 321, 15, ''),
-    (2, 2, 533, 12, '');
+    (1, 1, 'zamowienie 1', 123, 15, 'Miłego dnia :)'),
+    (2, 2, 'zamowienie 2', 999, 12, ''),
+    (1, 3, 'zamowienie 3', 321, 15, ''),
+    (2, 2, 'zamowienie 4', 533, 12, '');
 
 INSERT INTO status_platnosci(
     zamowienie_id,
     czy_zaplacone,
-    typ_platnosci,
-    tytul)
+    typ_platnosci)
 VALUES
-    (1, true, 'przelew', 'zamowienie nr 1'),
-    (2, false, 'blik', 'zamowienie nr 2'),
-    (3, true, 'przelew', 'zamowienie nr 3'),
-    (4, false, 'blik', ' zamowienie nr 4');
+    (1, true, 'przelew'),
+    (2, false, 'Blik'),
+    (3, true, 'przelew'),
+    (4, false, 'Blik');
 
 INSERT INTO pozycja_zamowienia(
     zamowienie_id,
     produkt_id,
-    ilosc)
+    ilosc,
+    cena_za_sztuke)
 VALUES
-    (1, 1, 5),
-    (1, 2, 2),
-    (2, 3, 1),
-    (3, 1, 2),
-    (3, 2, 3),
-    (4, 3, 2);
+    (1, 1, 5, 4799),
+    (1, 2, 2, 799),
+    (2, 3, 1, 9999),
+    (3, 4, 2, 7499),
+    (3, 5, 3, 729),
+    (4, 6, 2, 759);
 
 INSERT INTO opinia(
     gwiazdki,

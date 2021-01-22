@@ -59,7 +59,7 @@ class CommentsController {
             
             const response = await pool.query(SQL`
                 UPDATE opinia 
-                SET nick=${nick}, gwiazdki=${stars} opis=${description}
+                SET nick=${nick}, gwiazdki=${stars}, tresc=${description}
                 WHERE id=${commentId}
                 RETURNING id`
             );
@@ -75,10 +75,9 @@ class CommentsController {
         try{
             const commentId = parseInt(req.params.id);
 
-            const response = await pool.query(SQL`
-                DELETE FROM opnia 
-                WHERE id=${commentId}
-                RETURNING id;
+            await pool.query(SQL`
+                DELETE FROM opinia 
+                WHERE id=${commentId};
             `);
             
             res.status(200).send('Pomyślnie usunięto.');

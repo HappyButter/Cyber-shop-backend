@@ -27,8 +27,8 @@ class AuthController {
             res.status(201).json(newUser);
 
         }catch(err){
-            console.log(err.message);
-            return res.status(400).send("Wybierz inny adres email.");
+            console.log(err);
+            return res.status(400).json({ error: err.detail.toString() });
         }
     }
 

@@ -62,7 +62,7 @@ class PromosController {
                 RETURNING znizka`
             );
 
-            if(response.rows[0].znizka === discount){
+            if(parseFloat(response.rows[0].znizka) === discount){
                 res.status(201).send(`Promo with ID: '${id}' has been modified.`);
             }else{
                 res.status(406).send('Niepoprawna wartość zniżki. Wybierz z przedziału (0-1)');

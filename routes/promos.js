@@ -6,7 +6,7 @@ const promosRouter = Router();
 
 promosRouter.get('/', promosController.getAllPromos);
 promosRouter.put('/create', promosController.createPromo);
-promosRouter.put('/update/:id', promosController.updatePromo);
+promosRouter.post('/update/:id', promosController.updatePromo);
 promosRouter.delete('/delete/:id', promosController.deletePromo);
 
 export default promosRouter;

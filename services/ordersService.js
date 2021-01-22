@@ -6,18 +6,20 @@ const {SQL} = sqlTemplate;
 class OrdersService {
     createOrder = async ( orderData, client = pool ) => {
         try{
-            const { userId, addressId, productsCost, shippmentPrice, clientComments } = orderData;
+            const { userId, addressId, title, productsCost, shippmentPrice, clientComments } = orderData;
 
             const newOrderId = await client.query(SQL`
                 INSERT INTO zamowienie( 
                     uzytkownik_id,
                     adres_id,
+                    tytul,
                     koszt_produktow,
                     koszt_dostawy,
                     uwagi_klienta)
                 VALUES
                     (   ${userId}, 
                         ${addressId}, 
+                        ${title},
                         ${productsCost}, 
                         ${shippmentPrice}, 
                         ${clientComments}   )
@@ -52,17 +54,19 @@ class OrdersService {
 
     createOrderItem = async ( orderItemData, client = pool) => {
         try{
-            const { orderId, productId, quantity } = orderItemData;
+            const { orderId, productId, quantity, price } = orderItemData;
 
             const newOrderItemId = await client.query(SQL`
                 INSERT INTO pozycja_zamowienia( 
                     zamowienie_id,
                     produkt_id,
-                    ilosc)
+                    ilosc,
+                    cena_za_sztuke)
                 VALUES
                     (   ${orderId}, 
                         ${productId}, 
-                        ${quantity}     )
+                        ${Math.abs(quantity)},
+                        ${price}    )
                 RETURNING id;`
             );
         
@@ -75,12 +79,44 @@ class OrdersService {
     reduceProductQuantity = async ( orderItemData, client = pool ) => {
         try{
             const { productId, quantity } = orderItemData;
-            
-            await client.query(SQL`
-                UPDATE produkt 
-                SET stan_magazynu=stan_magazynu - ${quantity}
+
+            const inStockBefore = await client.query(SQL`
+                SELECT stan_magazynu FROM produkt 
                 WHERE id=${productId};
             `);
+
+            const inStockAfter = await client.query(SQL`
+                UPDATE produkt 
+                SET stan_magazynu=stan_magazynu - ${quantity}
+                WHERE id=${productId}
+                RETURNING stan_magazynu;
+            `);
+
+            return !(inStockBefore.rows[0].stan_magazynu === inStockAfter.rows[0].stan_magazynu);
+        }catch(err){
+            console.log(err.message);
+        }
+    }
+
+    createStorageUpdate = async ( orderData, client = pool ) => {
+        try{
+            const { userId, title, productsCost, shippmentPrice } = orderData;
+
+            const newOrderId = await client.query(SQL`
+                INSERT INTO zamowienie( 
+                    uzytkownik_id,
+                    tytul,
+                    koszt_produktow,
+                    koszt_dostawy)
+                VALUES
+                    (   ${userId}, 
+                        ${title}, 
+                        ${productsCost}, 
+                        ${shippmentPrice}   )
+                RETURNING id;`
+            );
+        
+            return newOrderId.rows[0].id;
         }catch(err){
             console.log(err.message);
         }

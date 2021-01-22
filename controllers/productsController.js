@@ -30,6 +30,7 @@ class ProductsController {
             name: product.nazwa,
             description: product.opis,
             price: parseFloat(product.cena),
+            profit_margin: parseFloat(product.marza),
             promo_price: parseFloat(product.cena_promo),
             rating: parseFloat(product.srednia_ocena),
             producer: product.producent,
@@ -55,6 +56,7 @@ class ProductsController {
         }
     }
 
+    // unused
     getAllProductsNames = async (req, res) => {
         try{
             const allProductsNames = await pool.query(SQL`
@@ -78,7 +80,7 @@ class ProductsController {
             const categoryName = categoriesEnum[categoryId];
 
             const products = await pool.query(SQL`
-                SELECT * FROM produkt_pelne_info
+                SELECT * FROM produkt_pelne_info_z_marza
                 WHERE nazwa_kategorii=${categoryName};
             `);
 
@@ -93,7 +95,7 @@ class ProductsController {
         try {
             const promoId = parseInt(req.params.id);
             const products = await pool.query(SQL`
-                SELECT * FROM produkt_pelne_info
+                SELECT * FROM produkt_pelne_info_z_marza
                 WHERE promocja=${promoId};
             `);
 
@@ -108,7 +110,7 @@ class ProductsController {
         try {
             const productId = parseInt(req.params.id);
             const product = await pool.query(SQL`
-                SELECT * FROM produkt_pelne_info
+                SELECT * FROM produkt_pelne_info_z_marza
                 WHERE id=${productId};
             `);
 
@@ -124,7 +126,8 @@ class ProductsController {
         try{
             const { name, 
                     description, 
-                    price,  
+                    price,
+                    profitMargin,  
                     producer, 
                     warranty, 
                     inStock, 
@@ -136,6 +139,7 @@ class ProductsController {
                             nazwa, 
                             opis, 
                             cena,
+                            marza,
                             producent,
                             okres_gwarancji,
                             stan_magazynu,
@@ -143,35 +147,35 @@ class ProductsController {
                             kategoria) 
                         VALUES (${name}, 
                                 ${description}, 
-                                ${price},  
+                                ${price},
+                                ${profitMargin},  
                                 ${producer}, 
                                 ${warranty}, 
                                 ${inStock}, 
                                 ${promo_id}, 
                                 ${category_id})
-                        RETURNING id;
+                        RETURNING *;
                     `);
 
-                    const responseId = { 
-                        id : product.rows[0].id,
-                    }
+                    const response = product.rows.map(this.mapProduct);
         
-                    res.status(201).json(responseId);
+                    console.log(response);
+                    res.status(201).json(response);
         }catch(err){
             console.log(err.message);
             return res.status(400).send("Niepoprawne dane.");
         }
     }
 
-    updateProduct = async (req, res) => {
+    updateProductDetails = async (req, res) => {
         try{
             const productId = parseInt(req.params.id);
             const { name, 
                     description, 
-                    price,  
+                    price,
+                    profitMargin,  
                     producer, 
                     warranty, 
-                    inStock, 
                     promo_id, 
                     category_id } = req.body;
 
@@ -181,34 +185,32 @@ class ProductsController {
                             nazwa=${name}, 
                             opis=${description}, 
                             cena=${price},
+                            marza=${profitMargin},
                             producent=${producer},
                             okres_gwarancji=${warranty},
-                            stan_magazynu=${inStock},
                             promocja=${promo_id},
                             kategoria=${category_id}
                         WHERE id=${productId} 
-                        RETURNING id;
+                        RETURNING *;
                     `);
 
-                    const id = product.rows[0].id;
-
-                    res.status(201).send(`Product with ID: '${id}' has been modified.`);
+                    res.status(201).json(product.rows.map(this.mapProduct));
         }catch(err){
             console.log(err.message);
             return res.status(400).send("Niepoprawne dane.");
         }
-    }
-
-    deleteProduct = async (req, res) => {
-        try {
-            const productId = parseInt(req.params.id);
-            await pool.query(SQL`
-                DELETE FROM produkt WHERE id=${productId}; 
+    }   
+    
+    getAllProductsForManagement = async (req, res) => {
+        try{
+            const products = await pool.query(SQL`
+                SELECT * FROM produkt_pelne_info;
             `);
-
-            res.status(200).send('Pomyślnie usunięto.');
+            
+            const productsMapped = products.rows.map(this.mapProduct);
+            res.status(200).json(productsMapped);
         }catch(err){
-            console.log(err.message);
+            console.log(err);
         }
     }
 }

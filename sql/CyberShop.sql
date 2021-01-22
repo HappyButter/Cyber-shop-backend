@@ -46,19 +46,19 @@ CREATE TABLE "status_platnosci" (
   "id" SERIAL PRIMARY KEY,
   "zamowienie_id" int,
   "czy_zaplacone" boolean NOT NULL DEFAULT false,
-  "typ_platnosci" varchar NOT NULL,
-  "tytul" varchar
+  "typ_platnosci" varchar NOT NULL
 );
 
 CREATE TABLE "zamowienie" (
   "id" SERIAL PRIMARY KEY,
   "uzytkownik_id" int,
   "adres_id" int,
+  "tytul" varchar,
   "status" status_zamowienia DEFAULT 'nowe',
   "data_utworzenia" timestamp DEFAULT (now()),
   "data_zrealizowania" timestamp DEFAULT null,
-  "koszt_produktow" float NOT NULL,
-  "koszt_dostawy" float NOT NULL,
+  "koszt_produktow" numeric(7,2) NOT NULL,
+  "koszt_dostawy" numeric(7,2) NOT NULL,
   "uwagi_klienta" varchar DEFAULT null
 );
 
@@ -66,15 +66,15 @@ CREATE TABLE "pozycja_zamowienia" (
   "id" SERIAL PRIMARY KEY,
   "zamowienie_id" int,
   "produkt_id" int,
-  "ilosc" int NOT NULL
+  "ilosc" int NOT NULL,
+  "cena_za_sztuke" numeric(7,2) NOT NULL
 );
 
 CREATE TABLE "serwis" (
   "id" SERIAL PRIMARY KEY,
   "pozycja_zamowienia_id" int,
   "opis_usterki" varchar,
-  "status" varchar,
-  "ilosc" int
+  "status" varchar
 );
 
 CREATE TABLE "kategoria_produktu" (
@@ -87,9 +87,10 @@ CREATE TABLE "produkt" (
   "id" SERIAL PRIMARY KEY,
   "nazwa" varchar NOT NULL,
   "opis" varchar,
-  "cena" float NOT NULL,
-  "cena_promo" float DEFAULT null,
-  "srednia_ocena" float DEFAULT null,
+  "cena" numeric(7,2) NOT NULL,
+  "marza" numeric(3,2) NOT NULL,
+  "cena_promo" numeric(7,2) DEFAULT null,
+  "srednia_ocena" numeric(2,1) DEFAULT null,
   "producent" varchar NOT NULL,
   "okres_gwarancji" int NOT NULL,
   "stan_magazynu" int DEFAULT 0,
@@ -110,7 +111,7 @@ CREATE TABLE "promocja" (
   "id" SERIAL PRIMARY KEY,
   "nazwa" varchar NOT NULL,
   "opis" varchar,
-  "znizka" float NOT NULL DEFAULT 0
+  "znizka" numeric(3,2) NOT NULL DEFAULT 0
 );
 
 ALTER TABLE "adres" ADD FOREIGN KEY ("uzytkownik_id") REFERENCES "uzytkownik" ("id");

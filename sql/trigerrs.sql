@@ -4,6 +4,14 @@ RETURNS trigger AS $$
 DECLARE
     discount REAL := 0.0;
 BEGIN
+    IF (NEW.stan_magazynu < 0) THEN
+        IF (TG_OP = 'UPDATE') THEN
+            RETURN OLD;
+        ELSIF (TG_OP = 'INSERT') THEN
+            RETURN NULL;
+        END IF;
+    END IF;
+    
     IF NEW.promocja IS NOT NULL THEN
         discount := (SELECT (1-znizka) FROM promocja WHERE id=NEW.promocja);
         NEW.cena_promo := NEW.cena * discount;
@@ -41,25 +49,30 @@ FOR EACH ROW EXECUTE PROCEDURE zmodyfikuj_srednia_ocena();
 
 
 -- handle promo updates --
--- validate update promo price
+-- walidacja wartości zniżki promocyjnej
 CREATE OR REPLACE FUNCTION promocja_update_cena()
 RETURNS trigger AS $$
 BEGIN
+
     IF NEW.znizka < 0.0 OR NEW.znizka > 0.99 THEN
-        IF OLD IS NOT NULL THEN
+        IF (TG_OP = 'UPDATE') THEN
             RETURN OLD;
+        ELSIF (TG_OP = 'INSERT') THEN
+            RETURN NULL;
         END IF;
-        RETURN NULL;
     END IF;
+
     RETURN NEW;
 END $$
 LANGUAGE 'plpgsql';
 
-CREATE TRIGGER promocja_update_cena BEFORE INSERT OR UPDATE ON promocja
+CREATE TRIGGER promocja_update_cena 
+BEFORE INSERT OR UPDATE ON promocja
 FOR EACH ROW
 EXECUTE PROCEDURE promocja_update_cena();
 
 -- update promo price
+-- zmiana zniżki promocyjnej odświeża ceny promocyjne produktów
 CREATE OR REPLACE FUNCTION promocja_update()
 RETURNS trigger AS $$
 BEGIN
@@ -74,6 +87,7 @@ EXECUTE PROCEDURE promocja_update();
 
 
 -- delete promo
+-- usunięcie promocji odświeża ceny promocyjne produktów
 CREATE OR REPLACE FUNCTION promocja_delete()
 RETURNS trigger AS $$
 BEGIN
@@ -85,3 +99,27 @@ LANGUAGE 'plpgsql';
 CREATE TRIGGER promocja_delete BEFORE DELETE ON promocja
 FOR EACH ROW
 EXECUTE PROCEDURE promocja_delete();
+
+
+-- insert product ininto service controll
+---- protecting from inserting product out of warranty
+CREATE OR REPLACE FUNCTION sprawdz_aktywnosc_gwarancji()
+RETURNS trigger AS $$
+DECLARE
+    diff INTEGER := 0;
+    warrantyTime INTEGER;
+BEGIN
+    warrantyTime := (select okres_gwarancji from produkt p where p.id=(SELECT produkt_id FROM pozycja_zamowienia WHERE id=NEW.pozycja_zamowienia_id));
+    diff := (SELECT round(( now()::date - data_zrealizowania::date ) / 31) AS days FROM zamowienie WHERE zamowienie.id=(select zamowienie_id from pozycja_zamowienia where id=NEW.pozycja_zamowienia_id));
+
+    IF (warrantyTime - diff) > 0 THEN
+        return NEW;
+    ELSE
+        return NULL;
+    end if;
+END $$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER sprawdz_aktywnosc_gwarancji BEFORE INSERT ON serwis
+FOR EACH ROW
+EXECUTE PROCEDURE sprawdz_aktywnosc_gwarancji();
