@@ -71,7 +71,8 @@ CREATE VIEW rekomendowane AS
 DROP VIEW IF EXISTS zamowienie_pelne_info;
 
 CREATE VIEW zamowienie_pelne_info AS
-    SELECT z.uzytkownik_id,
+    SELECT 
+        z.uzytkownik_id,
         DATE(z.data_utworzenia) as data_utworzenia,
         DATE(z.data_zrealizowania) as data_zrealizowania,
         z.koszt_produktow,

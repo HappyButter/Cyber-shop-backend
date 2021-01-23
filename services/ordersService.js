@@ -78,17 +78,17 @@ class OrdersService {
 
     reduceProductQuantity = async ( orderItemData, client = pool ) => {
         try{
-            const { productId, quantity } = orderItemData;
+            const { id, quantity } = orderItemData;
 
             const inStockBefore = await client.query(SQL`
                 SELECT stan_magazynu FROM produkt 
-                WHERE id=${productId};
+                WHERE id=${id};
             `);
 
             const inStockAfter = await client.query(SQL`
                 UPDATE produkt 
                 SET stan_magazynu=stan_magazynu - ${quantity}
-                WHERE id=${productId}
+                WHERE id=${id}
                 RETURNING stan_magazynu;
             `);
 

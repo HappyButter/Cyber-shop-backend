@@ -28,6 +28,7 @@ class AdressesService {
                     RETURNING id;`
             );
         
+            console.log(newAddressID.rows[0].id);
             return newAddressID.rows[0].id;
         }catch(err){
             console.log(err.message);

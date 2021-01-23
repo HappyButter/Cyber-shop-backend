@@ -149,6 +149,7 @@ class OrdersController {
             ? newAddressId = req.body.addressId
             : newAddressId = await adressesService.createAddress(req.body, client);
 
+
             const newOrderId = await ordersService.createOrder( {...req.body, addressId : newAddressId }, client);
             await ordersService.createPaymentStatus({...req.body, orderId : newOrderId }, client);
             
