@@ -11,6 +11,7 @@ class OrdersController {
         return {
             order_id : order.zamowienie_id,
             user_id : order.uzytkownik_id,
+            orderStatus : order.status_zamowienia,
             title : order.tytul,
             payment_status_id : order.status_platnosci_id,
             address_id : order.adres_id,
@@ -30,6 +31,51 @@ class OrdersController {
         }   
     }
 
+    mapOrderedProduct = (prod) => {
+        return {
+            name : prod.nazwa_produktu,
+            orderLineId : prod.pozycja_zamowienia_id,
+            productId : prod.produkt_id,
+            quantity : prod.ilosc,
+            pricePerItem : prod.cena_za_sztuke
+        }
+    }
+
+    updateOrderPaymentStatus = async (req, res) => {
+        try {
+            const orderId = parseInt(req.params.id);
+            const { isPaid } = req.body;
+            const result = await pool.query(SQL`
+                UPDATE status_platnosci 
+                SET czy_zaplacone=${isPaid}
+                WHERE zamowienie_id=${orderId}
+                RETURNING zamowienie_id;
+            `);
+
+            res.status(201).json(result.rows[0].zamowienie_id);
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    updateOrderStatus = async (req, res) => {
+        try {
+            const orderId = parseInt(req.params.id);
+            const { status } = req.body;
+
+            const updatedOrder = await pool.query(SQL`
+                UPDATE zamowienie
+                SET status=${status}
+                WHERE id=${orderId}
+                RETURNING *;
+            `);
+
+            res.status(201).json(updatedOrder.rows.map(this.mapOrder));
+        }catch(err){
+            console.log(err);
+        }
+    }
+
     getAllOrdersDetails = async (req, res) => {
         try {
             const orders = await pool.query(SQL`
@@ -37,6 +83,15 @@ class OrdersController {
             `);
 
             const ordersMapped = orders.rows.map(this.mapOrder);
+
+            for(let order of ordersMapped){
+                const productList = await pool.query(SQL`
+                    SELECT * FROM zamowione_produkty 
+                    WHERE zamowienie_id=${order.order_id};
+                `);
+                order.productList = productList.rows.map(this.mapOrderedProduct);
+            };
+
             res.status(200).json(ordersMapped);
 
         }catch(err){

@@ -8,5 +8,7 @@ ordersRouter.get('/', ordersController.getAllOrdersDetails);
 ordersRouter.get('/:id', ordersController.getOrdersDetailsByUserId);
 ordersRouter.post('/', ordersController.createOrder);
 ordersRouter.put('/storage', ordersController.updateStorage);
+ordersRouter.put('/payment/:id', ordersController.updateOrderPaymentStatus);
+ordersRouter.put('/status/:id', ordersController.updateOrderStatus);
 
 export default ordersRouter;

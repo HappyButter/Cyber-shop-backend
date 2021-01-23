@@ -53,8 +53,8 @@ CREATE VIEW produkt_pelne_info_z_marza AS
         kategoria,
         nazwa_kategorii,
         typ,
-            ROUND(cena_promo * (1.0 + marza), 2) as cena_promo,
-            ROUND(cena * (1.0 + marza), 2) as cena
+        ROUND(cena_promo * (1.0 + marza), 2) as cena_promo,
+        ROUND(cena * (1.0 + marza), 2) as cena
     FROM produkt_pelne_info 
     WHERE stan_magazynu>0;
 
@@ -77,10 +77,12 @@ CREATE VIEW zamowienie_pelne_info AS
         z.koszt_produktow,
         z.koszt_dostawy,
         z.uwagi_klienta,
+        z.tytul,
+        z.status as status_zamowienia,
+        sp.zamowienie_id,
         sp.czy_zaplacone,
         sp.id as status_platnosci_id,
         sp.typ_platnosci,
-        z.tytul,
         a.id as adres_id,
         a.panstwo,
         a.kod_pocztowy,
