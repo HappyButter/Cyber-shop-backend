@@ -6,23 +6,23 @@ const {SQL} = sqlTemplate;
 class OrdersService {
     createOrder = async ( orderData, client = pool ) => {
         try{
-            const { userId, addressId, title, productsCost, shippmentPrice, clientComments } = orderData;
+            const { userId, addressId, productsCost, shippmentPrice, clientComments, shippmentMethod } = orderData;
 
             const newOrderId = await client.query(SQL`
                 INSERT INTO zamowienie( 
                     uzytkownik_id,
                     adres_id,
-                    tytul,
                     koszt_produktow,
                     koszt_dostawy,
-                    uwagi_klienta)
+                    uwagi_klienta,
+                    metoda_dostawy)
                 VALUES
                     (   ${userId}, 
-                        ${addressId}, 
-                        ${title},
+                        ${addressId},
                         ${productsCost}, 
                         ${shippmentPrice}, 
-                        ${clientComments}   )
+                        ${clientComments},
+                        ${shippmentMethod}   )
                 RETURNING id;`
             );
         
@@ -54,7 +54,7 @@ class OrdersService {
 
     createOrderItem = async ( orderItemData, client = pool) => {
         try{
-            const { orderId, productId, quantity, price } = orderItemData;
+            const { orderId, id, quantity, price } = orderItemData;
 
             const newOrderItemId = await client.query(SQL`
                 INSERT INTO pozycja_zamowienia( 
@@ -64,7 +64,7 @@ class OrdersService {
                     cena_za_sztuke)
                 VALUES
                     (   ${orderId}, 
-                        ${productId}, 
+                        ${id}, 
                         ${Math.abs(quantity)},
                         ${price}    )
                 RETURNING id;`

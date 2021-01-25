@@ -1,5 +1,5 @@
 import express from 'express';
-import adressesController from '../controllers/adressesController.js';
+import adressesController from '../controllers/addressesController.js';
 
 const { Router } = express;
 const adressesRouter = Router();

@@ -71,7 +71,11 @@ CREATE VIEW rekomendowane AS
 DROP VIEW IF EXISTS zamowienie_pelne_info;
 
 CREATE VIEW zamowienie_pelne_info AS
-    SELECT 
+    SELECT
+        u.imie,
+        u.nazwisko,
+        u.email,
+        u.telefon,
         z.uzytkownik_id,
         DATE(z.data_utworzenia) as data_utworzenia,
         DATE(z.data_zrealizowania) as data_zrealizowania,
@@ -93,7 +97,8 @@ CREATE VIEW zamowienie_pelne_info AS
         a.nr_lokalu
         FROM zamowienie z
         JOIN status_platnosci sp on z.id = sp.zamowienie_id
-        JOIN adres a on z.adres_id = a.id;
+        JOIN adres a on z.adres_id = a.id
+        JOIN uzytkownik u on a.uzytkownik_id = u.id;
 
 
 -- ordered products

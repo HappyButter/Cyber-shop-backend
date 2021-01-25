@@ -1,6 +1,6 @@
 import pool from '../db/db.js';
 import sqlTemplate from 'sql-template-strings';
-import adressesService from '../services/adressesService.js';
+import addressesService from '../services/addressesService.js';
 
 const {SQL} = sqlTemplate;
 
@@ -51,7 +51,7 @@ class AdressesController {
 
     createAddress = async (req, res) => {
         try{
-            const newAddressID = await adressesService.createAddress(req.body);
+            const newAddressID = await addressesService.createAddress(req.body);
 
             res.status(201).send(`Address added with ID: ${newAddressID}`);
         }catch(err){
@@ -61,21 +61,9 @@ class AdressesController {
     
     updateAddress = async (req, res) => {
         try{
-            const addressId = parseInt(req.params.id)
-            const {country, postcode, city, street, building, apartment} = req.body;
-            
-            await pool.query(SQL`
-                UPDATE adres 
-                SET panstwo=${country}, 
-                    kod_pocztowy=${postcode}, 
-                    miejscowosc=${city}, 
-                    ulica=${street}, 
-                    nr_budynku=${building}, 
-                    nr_lokalu=${apartment}
-                WHERE id = ${addressId}`
-            );
+            const updatedAddressID = await addressesService.updateAddress(req.body);
 
-            res.status(200).send(`Address modified with ID: ${id}`)
+            res.status(201).send(`Address modified with ID: ${updatedAddressID}`);
         }catch(err){
             console.log(err.message);
         }

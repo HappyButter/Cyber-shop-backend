@@ -1,6 +1,6 @@
 import pool from '../db/db.js';
 import sqlTemplate from 'sql-template-strings';
-import adressesService from '../services/adressesService.js';
+import addressesService from '../services/addressesService.js';
 import ordersService from '../services/ordersService.js';
 
 const {SQL} = sqlTemplate;
@@ -11,10 +11,13 @@ class OrdersController {
         return {
             order_id : order.zamowienie_id,
             user_id : order.uzytkownik_id,
+            userName : order.imie,
+            userSurname : order.nazwisko,
+            email : order.email,
+            phoneNumber : order.telefon,
             orderStatus : order.status_zamowienia,
             title : order.tytul,
             payment_status_id : order.status_platnosci_id,
-            address_id : order.adres_id,
             datePlaced : order.data_utworzenia,
             dateFulfillment : order.data_zrealizowania,
             productsCost : order.koszt_produktow,
@@ -22,6 +25,8 @@ class OrdersController {
             clientComments : order.uwagi_klienta,
             isPaid : order.czy_zaplacone,
             paymentMethod : order.typ_platnosci,
+            
+            address_id : order.adres_id,
             country : order.panstwo,
             postCode : order.kod_pocztowy,
             city : order.miejscowosc,
@@ -102,13 +107,22 @@ class OrdersController {
     getOrdersDetailsByUserId = async (req, res) => {
         try {
             const userId = parseInt(req.params.id);
-            const order = await pool.query(SQL`
+            const orders = await pool.query(SQL`
                 SELECT * FROM zamowienie_pelne_info
                 WHERE uzytkownik_id=${userId};
             `);
 
-            const orderMapped = order.rows.map(this.mapOrder);
-            res.status(200).json(orderMapped);
+            const ordersMapped = orders.rows.map(this.mapOrder);
+
+            for(let order of ordersMapped){
+                const productList = await pool.query(SQL`
+                    SELECT * FROM zamowione_produkty 
+                    WHERE zamowienie_id=${order.order_id};
+                `);
+                order.productList = productList.rows.map(this.mapOrderedProduct);
+            };
+
+            res.status(200).json(ordersMapped);
         }catch(err){
             console.log(err.message);
         }
@@ -140,17 +154,24 @@ class OrdersController {
         const client = await pool.connect();
         try{
             await client.query(SQL`BEGIN`);
-            console.log(req.body);
 
             // check if user has chosen existing address
             let newAddressId;
 
             req.body.addressId !== null 
-            ? newAddressId = req.body.addressId
-            : newAddressId = await adressesService.createAddress(req.body, client);
+            ? newAddressId = await addressesService.updateAddress(req.body, client)
+            : newAddressId = await addressesService.createAddress(req.body, client);
 
 
             const newOrderId = await ordersService.createOrder( {...req.body, addressId : newAddressId }, client);
+
+            const title = `Zamówienie nr ${newOrderId}`;
+
+            await client.query(SQL`
+                UPDATE zamowienie
+                SET tytul=${title}
+                WHERE id=${newOrderId};
+            `);
             await ordersService.createPaymentStatus({...req.body, orderId : newOrderId }, client);
             
             const items = req.body.productList;
@@ -196,6 +217,7 @@ class OrdersController {
             await client.query(SQL`BEGIN`);
 
             const newOrderId = await ordersService.createStorageUpdate( req.body, client);
+            
             
             const isSuccess = await ordersService.reduceProductQuantity(req.body, client);
             if(!isSuccess){  
