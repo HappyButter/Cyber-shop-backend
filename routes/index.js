@@ -16,7 +16,7 @@ const mountRouter = app => {
     app.use('/products', productsRouter);
     app.use('/promos', promosRouter);
     app.use('/comments', commentsRouter);
-    app.use('/category', categoryRouter);
+    app.use('/categories', categoryRouter);
     app.use('/service', productsServiceRouter);
 }
 

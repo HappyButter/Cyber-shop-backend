@@ -217,8 +217,7 @@ class OrdersController {
             await client.query(SQL`BEGIN`);
 
             const newOrderId = await ordersService.createStorageUpdate( req.body, client);
-            
-            
+        
             const isSuccess = await ordersService.reduceProductQuantity(req.body, client);
             if(!isSuccess){  
                 await client.query('ROLLBACK');

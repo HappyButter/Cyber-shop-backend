@@ -29,6 +29,7 @@ class CategoryController {
 
             res.status(200).json(categories.rows.map(
                 cat => ({
+                    id: cat.id,
                     category_name: cat.nazwa,
                     category_group: cat.typ,
                 })))

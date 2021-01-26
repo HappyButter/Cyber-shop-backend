@@ -59,6 +59,7 @@ CREATE TABLE "zamowienie" (
   "data_zrealizowania" timestamp DEFAULT null,
   "koszt_produktow" numeric(7,2) NOT NULL,
   "koszt_dostawy" numeric(7,2) NOT NULL,
+  "metoda_dostawy" varchar(30) DEFAULT '',
   "uwagi_klienta" varchar DEFAULT null
 );
 

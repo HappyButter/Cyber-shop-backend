@@ -130,37 +130,40 @@ class ProductsController {
                     profitMargin,  
                     producer, 
                     warranty, 
-                    inStock, 
                     promo_id, 
                     category_id } = req.body;
 
-                    const product = await pool.query(SQL`
-                        INSERT INTO produkt(
-                            nazwa, 
-                            opis, 
-                            cena,
-                            marza,
-                            producent,
-                            okres_gwarancji,
-                            stan_magazynu,
-                            promocja,
-                            kategoria) 
-                        VALUES (${name}, 
-                                ${description}, 
-                                ${price},
-                                ${profitMargin},  
-                                ${producer}, 
-                                ${warranty}, 
-                                ${inStock}, 
-                                ${promo_id}, 
-                                ${category_id})
-                        RETURNING *;
-                    `);
+            const newProductId = await pool.query(SQL`
+                INSERT INTO produkt(
+                    nazwa, 
+                    opis, 
+                    cena,
+                    marza,
+                    producent,
+                    okres_gwarancji,
+                    promocja,
+                    kategoria) 
+                VALUES (${name}, 
+                        ${description}, 
+                        ${price},
+                        ${profitMargin},  
+                        ${producer}, 
+                        ${warranty}, 
+                        ${promo_id}, 
+                        ${category_id})
+                RETURNING id;
+            `);
 
-                    const response = product.rows.map(this.mapProduct);
-        
-                    console.log(response);
-                    res.status(201).json(response);
+            const productId = newProductId.rows[0].id;
+            
+            const product = await pool.query(SQL`
+                SELECT * FROM produkt_pelne_info
+                WHERE id=${productId};
+            `);
+
+            const productMapped = product.rows.map(this.mapProduct);
+
+            res.status(200).json(productMapped);
         }catch(err){
             console.log(err.message);
             return res.status(400).send("Niepoprawne dane.");
@@ -179,22 +182,30 @@ class ProductsController {
                     promo_id, 
                     category_id } = req.body;
 
-                    const product = await pool.query(SQL`
-                        UPDATE produkt
-                        SET
-                            nazwa=${name}, 
-                            opis=${description}, 
-                            cena=${price},
-                            marza=${profitMargin},
-                            producent=${producer},
-                            okres_gwarancji=${warranty},
-                            promocja=${promo_id},
-                            kategoria=${category_id}
-                        WHERE id=${productId} 
-                        RETURNING *;
-                    `);
+            const newProductId = await pool.query(SQL`
+                UPDATE produkt
+                SET
+                    nazwa=${name}, 
+                    opis=${description}, 
+                    cena=${price},
+                    marza=${profitMargin},
+                    producent=${producer},
+                    okres_gwarancji=${warranty},
+                    promocja=${promo_id},
+                    kategoria=${category_id}
+                WHERE id=${productId} 
+                RETURNING id;
+            `);
 
-                    res.status(201).json(product.rows.map(this.mapProduct));
+            const id = newProductId.rows[0].id;
+
+            const product = await pool.query(SQL`
+                SELECT * FROM produkt_pelne_info
+                WHERE id=${id};
+            `);
+
+            const productMapped = product.rows.map(this.mapProduct);
+            res.status(200).json(productMapped);
         }catch(err){
             console.log(err.message);
             return res.status(400).send("Niepoprawne dane.");
