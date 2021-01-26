@@ -35,14 +35,11 @@ class PromosController {
             const promo = await pool.query(SQL`
                 INSERT INTO promocja(nazwa, opis, znizka) 
                 VALUES (${title}, ${description}, ${discount})
-                RETURNING id;
+                RETURNING *;
             `);
 
-            const responseId = { 
-                id : promo.rows[0].id,
-            }
-
-            res.status(201).json(responseId);
+            const response = promo.rows.map(this.mapPromo);
+            res.status(201).json(response);
 
         }catch(err){
             console.log(err.message);
@@ -59,11 +56,12 @@ class PromosController {
                 UPDATE promocja 
                 SET nazwa=${title}, opis=${description}, znizka=${discount}
                 WHERE id=${id}
-                RETURNING znizka`
+                RETURNING *`
             );
 
             if(parseFloat(response.rows[0].znizka) === discount){
-                res.status(201).send(`Promo with ID: '${id}' has been modified.`);
+                const promoMapped = response.rows.map(this.mapPromo);
+                res.status(201).json(promoMapped[0]);
             }else{
                 res.status(406).send('Niepoprawna wartość zniżki. Wybierz z przedziału (0-1)');
             }
