@@ -10,5 +10,6 @@ ordersRouter.post('/', ordersController.createOrder);
 ordersRouter.put('/storage', ordersController.updateStorage);
 ordersRouter.put('/payment/:id', ordersController.updateOrderPaymentStatus);
 ordersRouter.put('/status/:id', ordersController.updateOrderStatus);
+ordersRouter.get('/shop/balance', ordersController.getShopBalance);
 
 export default ordersRouter;

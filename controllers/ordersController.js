@@ -46,19 +46,40 @@ class OrdersController {
         }
     }
 
+    getShopBalance = async (req, res) => {
+        try {
+            const balance = await pool.query(SQL`
+                SELECT * FROM saldo_sklepu;
+            `);
+            
+            const balanceMapped = {
+                income : balance.rows[0].round,
+                incomeCount : balance.rows[0].count,
+                outcome : balance.rows[1].round,
+                outcomeCount : balance.rows[1].count,
+            } 
+
+            res.status(200).json(balanceMapped);
+        }catch(err){
+            res.status(409).json(err.message);
+            console.log(err);
+        }
+    }
+
     updateOrderPaymentStatus = async (req, res) => {
         try {
             const orderId = parseInt(req.params.id);
             const { isPaid } = req.body;
+            
             const result = await pool.query(SQL`
                 UPDATE status_platnosci 
                 SET czy_zaplacone=${isPaid}
                 WHERE zamowienie_id=${orderId}
                 RETURNING zamowienie_id;
             `);
-
-            res.status(201).json(result.rows[0].zamowienie_id);
+            res.status(201).json("updated");
         }catch(err){
+            res.status(409).json(err.message);
             console.log(err);
         }
     }
@@ -72,10 +93,10 @@ class OrdersController {
                 UPDATE zamowienie
                 SET status=${status}
                 WHERE id=${orderId}
-                RETURNING *;
+                RETURNING id;
             `);
 
-            res.status(201).json(updatedOrder.rows.map(this.mapOrder));
+            res.status(201).json("ok");
         }catch(err){
             console.log(err);
         }

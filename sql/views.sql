@@ -15,6 +15,7 @@ CREATE VIEW produkty_w_serwisie AS
            ppzz.*
     FROM serwis s LEFT JOIN
         (SELECT DATE(z.data_zrealizowania) as data_zrealizowania_zamowienia,
+                z.tytul as tytul_zamowienia,
                 ppz.*
         FROM zamowienie z RIGHT JOIN
             (SELECT p.nazwa,
@@ -63,8 +64,20 @@ CREATE VIEW produkt_pelne_info_z_marza AS
 DROP VIEW IF EXISTS rekomendowane;
 
 CREATE VIEW rekomendowane AS
-    SELECT id, nazwa, cena, cena_promo, srednia_ocena, producent, stan_magazynu, promocja, kategoria, nazwa_kategorii, typ FROM produkt_pelne_info_z_marza
-    ORDER BY srednia_ocena LIMIT 6;
+    SELECT id,
+            nazwa,
+            cena,
+            cena_promo,
+            srednia_ocena,
+            producent,
+            stan_magazynu,
+            promocja,
+            kategoria,
+            nazwa_kategorii,
+            typ
+    FROM produkt_pelne_info_z_marza
+    WHERE srednia_ocena IS NOT NULL
+    ORDER BY srednia_ocena DESC LIMIT 6;
 
 
 -- order full info
@@ -108,3 +121,12 @@ CREATE VIEW zamowione_produkty AS
     SELECT p.nazwa, pz.produkt_id, pz.ilosc, pz.cena_za_sztuke 
     FROM pozycja_zamowienia pz
         JOIN produkt p ON pz.produkt_id = p.id;
+
+
+-- shop finances balance
+CREATE VIEW saldo_sklepu AS
+    SELECT COUNT(*),
+           ROUND(sum(koszt_produktow),2)
+    FROM zamowienie
+    WHERE status<>'anulowane'
+    GROUP BY koszt_produktow < 0;
