@@ -123,3 +123,26 @@ LANGUAGE 'plpgsql';
 CREATE TRIGGER sprawdz_aktywnosc_gwarancji BEFORE INSERT ON serwis
 FOR EACH ROW
 EXECUTE PROCEDURE sprawdz_aktywnosc_gwarancji();
+
+
+
+
+
+-- update fulfilment date after order status modify
+CREATE OR REPLACE FUNCTION aktualizuj_data_zrealizowania()
+RETURNS trigger AS $$
+BEGIN
+    IF (NEW.status = 'zrealizowane') THEN
+        NEW.data_zrealizowania :=  now();
+    ELSE 
+        NEW.data_zrealizowania :=  NULL;
+    END IF;
+    RETURN NEW;
+END $$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER aktualizuj_data_zrealizowania 
+BEFORE UPDATE ON zamowienie
+FOR EACH ROW
+WHEN (OLD.status IS DISTINCT FROM NEW.status)
+EXECUTE PROCEDURE aktualizuj_data_zrealizowania();
