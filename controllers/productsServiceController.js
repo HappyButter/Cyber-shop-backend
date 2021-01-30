@@ -53,7 +53,7 @@ class ProductServiceController {
 
                 res.status(201).json(productInService.rows.map(this.mapServiceFullInfo));
             }else{
-                res.status(409).json("Something went wrong");
+                res.status(409).json({message:"Something went wrong"});
             }
         
 

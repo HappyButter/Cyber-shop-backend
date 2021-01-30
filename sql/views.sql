@@ -83,8 +83,10 @@ CREATE VIEW rekomendowane AS
 -- order full info
 DROP VIEW IF EXISTS zamowienie_pelne_info;
 
+
 CREATE VIEW zamowienie_pelne_info AS
     SELECT
+        z.id as zamowienie_id,
         u.imie,
         u.nazwisko,
         u.email,
@@ -97,7 +99,6 @@ CREATE VIEW zamowienie_pelne_info AS
         z.uwagi_klienta,
         z.tytul,
         z.status as status_zamowienia,
-        sp.zamowienie_id,
         sp.czy_zaplacone,
         sp.id as status_platnosci_id,
         sp.typ_platnosci,
@@ -109,18 +110,26 @@ CREATE VIEW zamowienie_pelne_info AS
         a.nr_budynku,
         a.nr_lokalu
         FROM zamowienie z
-        JOIN status_platnosci sp on z.id = sp.zamowienie_id
-        JOIN adres a on z.adres_id = a.id
-        JOIN uzytkownik u on a.uzytkownik_id = u.id;
+        LEFT JOIN status_platnosci sp on z.id = sp.zamowienie_id
+        LEFT JOIN adres a on z.adres_id = a.id
+        LEFT JOIN uzytkownik u on z.uzytkownik_id = u.id
+        ORDER BY z.data_utworzenia DESC;
+
 
 
 -- ordered products
-DROP VIEW IF EXISTS zamowione_produkty;
+drop view zamowione_produkty;
 
-CREATE VIEW zamowione_produkty AS 
-    SELECT p.nazwa, pz.produkt_id, pz.ilosc, pz.cena_za_sztuke 
+CREATE VIEW zamowione_produkty AS
+    SELECT p.nazwa as nazwa_produktu,
+           pz.id as pozycja_zamowienia_id,
+           pz.produkt_id,
+           pz.ilosc,
+           pz.cena_za_sztuke,
+           pz.zamowienie_id
     FROM pozycja_zamowienia pz
         JOIN produkt p ON pz.produkt_id = p.id;
+
 
 
 -- shop finances balance

@@ -124,8 +124,27 @@ CREATE TRIGGER sprawdz_aktywnosc_gwarancji BEFORE INSERT ON serwis
 FOR EACH ROW
 EXECUTE PROCEDURE sprawdz_aktywnosc_gwarancji();
 
+-- protect from inserting to many produckts to service from one order
+CREATE OR REPLACE FUNCTION sprawdz_ilosc_produktow_w_serwisie()
+RETURNS trigger AS $$
+DECLARE
+    orderedProductsCount INTEGER := 0;
+    inServiceProductCount INTEGER := 0;
+BEGIN
+    inServiceProductCount := (select count(*) from serwis where pozycja_zamowienia_id=NEW.pozycja_zamowienia_id);
+    orderedProductsCount := (select ilosc from pozycja_zamowienia where id=NEW.pozycja_zamowienia_id);
 
+    IF (orderedProductsCount - inServiceProductCount) > 0 THEN
+        return NEW;
+    ELSE
+        return NULL;
+    end if;
+END $$
+LANGUAGE 'plpgsql';
 
+CREATE TRIGGER sprawdz_ilosc_produktow_w_serwisie BEFORE INSERT ON serwis
+FOR EACH ROW
+EXECUTE PROCEDURE sprawdz_ilosc_produktow_w_serwisie();
 
 
 -- update fulfilment date after order status modify
@@ -146,3 +165,4 @@ BEFORE UPDATE ON zamowienie
 FOR EACH ROW
 WHEN (OLD.status IS DISTINCT FROM NEW.status)
 EXECUTE PROCEDURE aktualizuj_data_zrealizowania();
+
