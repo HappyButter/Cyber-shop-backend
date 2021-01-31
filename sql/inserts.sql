@@ -1,19 +1,17 @@
 INSERT INTO uzytkownik(typ, imie, nazwisko, email, telefon, haslo)
-VALUES 
-    ('klient', 'Adrian', 'Fórman', 'forman@email.com', '+48222456789', '123456'),
-    ('klient', 'Roman', 'Jarosiński', 'jarosinski@email.com', '+48222456719', '123456'),
-    ('admin', 'Kasia', 'Jasia', 'jasia@email.com', '+48222456719', 'admin'),
-    ('admin', 'Jan', 'Kowalski', 'kowalski@email.com', '+48322456719', 'admin'),
+VALUES
+    ('klient', 'Halina', 'Nowak', 'nowak@email.com', '222-456-789', '123456'),
+    ('klient', 'Adam', 'Abacki', 'abacki@email.com', '222-456-719', '123456'),
     ('klient', 'Janusz', 'Kowalski', 'k2owalski@email.com', '+48322456739', 'klient'),
-    ('admin', 'Jan', 'Długosz', 'a@a.com', '+48322456719', 'a');
+    ('admin', 'Jan', 'Matejko', 'matejko@email.com', '222-456-719', 'admin');
 
-INSERT INTO promocja(nazwa, opis, znizka) 
+INSERT INTO promocja(nazwa, opis, znizka)
 VALUES
     ('ŚWIĘTA', 'Cyber święta z CyberShop już teraz! Tniemy ceny na maksa!', 0.20),
     ('Tydzień smartfonów Xiaomi', 'Przenieś się w nowy wymiar z nowym smartfonem Xiaomi', 0.30);
 
 INSERT INTO kategoria_produktu(nazwa, typ)
-VALUES 
+VALUES
     ('Smartfony i smartwatche','Smartfony'),
     ('Smartfony i smartwatche','Smartwatche'),
     ('Smartfony i smartwatche','Akcesoria'),
@@ -25,8 +23,8 @@ VALUES
     ('Podzespoły komputerowe', 'Zasilacze');
 
 INSERT INTO produkt(
-    nazwa, 
-    opis, 
+    nazwa,
+    opis,
     cena,
     marza,
     producent,
@@ -34,15 +32,15 @@ INSERT INTO produkt(
     stan_magazynu,
     promocja,
     kategoria)
-VALUES 
-    ('Apple iPhone 12‌ mini 128GB (czerwony)', 'Dzwoni', 4799, 0.2, 'Apple', 12, 131, 2,1),
-    ('Xiaomi Redmi Note 10 Pro', 'Dzwoni', 799, 0.2, 'Xiaomi', 24, 999, 2,1),
+VALUES
+    ('Apple iPhone 12‌ mini 128GB (czerwony)', 'Dzwoni', 4799.00, 0.2, 'Apple', 12, 111, 1, 1),
+    ('Xiaomi Redmi Note 10 Pro', 'Też dzwoni', 1499.00, 0.2, 'Xiaomi', 24, 322, 2, 1),
+    ('Xiaomi Redmi Note 9 Pro 6/128GB Grey', 'Stworzony dla Ciebie aparat do wykonywania świetnych ujęć.', 999.00, 0.2, 'Xiaomi', 12, 399, 2, 1),
     ('Apple Watch 3 38mm biały', 'Wyświetla godzinę', 9999, 0.2, 'Apple', 12, 123, null, 2),
-    ('TestItem1', 'testuje1', 7499, 0.2, 'Testex1', 12, 399, 2,1),
-    ('TestItem2', 'testuje2', 729, 0.2, 'Testex2', 24, 949, 1,2),
-    ('TestItem3', 'testuje3', 759, 0.2, 'Testex3', 24, 959, 2,4);
+    ('HP Pavilion Gaming i5/32GB/512/Win10x GTX1650Ti 144Hz', 'Dobry do MS Word', 4699.00, 0.2, 'HP', 24, 56, 1, 5),
+    ('Intel Core i5‑10400F', 'testuje3', 699, 0.25, 'Intel', 24, 222, null, 7);
 
-INSERT INTO adres( 
+INSERT INTO adres(
     uzytkownik_id,
     panstwo,
     kod_pocztowy,
@@ -51,9 +49,9 @@ INSERT INTO adres(
     nr_budynku,
     nr_lokalu)
 VALUES
-    (1, 'Polska', '26-600', 'Radom', 'Żeromskiego', '1', '1a'),
-    (1, 'Polska', '26-636', 'Radom', 'Piłsudskiego', '2', '2a'),
-    (2, 'Polska', '77-737', 'Kraków', 'Krakowska', '7', '2b');
+    (4, 'Polska', '26-600', 'Radom', 'Żeromskiego', '1', '1a'),
+    (4, 'Polska', '26-636', 'Radom', 'Piłsudskiego', '2', '2a'),
+    (1, 'Polska', '77-737', 'Kraków', 'Krakowska', '7', '2b');
 
 
 INSERT INTO zamowienie(
@@ -64,19 +62,19 @@ INSERT INTO zamowienie(
     koszt_dostawy,
     uwagi_klienta)
 VALUES
-    (1, 1, 'zamowienie 1', 123, 15, 'Miłego dnia :)'),
-    (2, 2, 'zamowienie 2', 999, 12, ''),
-    (1, 3, 'zamowienie 3', 321, 15, ''),
-    (2, 2, 'zamowienie 4', 533, 12, '');
+    (4, 1, 'Zamówienie nr 1', 123, 15, 'Miłego dnia :)'),
+    (4, 2, 'Zamówienie nr 2', 999, 10, ''),
+    (1, 3, 'Zamówienie nr 3', 321, 15, ''),
+    (1, 3, 'Zamówienie nr 4', 533, 5, '');
 
 INSERT INTO status_platnosci(
     zamowienie_id,
     czy_zaplacone,
     typ_platnosci)
 VALUES
-    (1, true, 'przelew'),
+    (1, true, 'Karta'),
     (2, false, 'Blik'),
-    (3, true, 'przelew'),
+    (3, true, 'Gotówka przy odbiorze'),
     (4, false, 'Blik');
 
 INSERT INTO pozycja_zamowienia(
@@ -94,28 +92,29 @@ VALUES
 
 INSERT INTO opinia(
     gwiazdki,
+    nick,
     tresc,
     produkt_id,
     autor_id)
 VALUES
-    ('5', 'Dobry produkt. Moje życie uległo zmianie od kiedy kupiłem ten produkt. Polecam', 2, 1),
-    ('3', 'Apple not gut.', 1, 2),
-    ('4', '', 2, 2),
-    ('1', '', 2, 3),
-    ('4', '', 2, 4),
-    ('2', '', 1, 1),
-    ('5', 'Test Kom', 4, 1),
-    ('3', 'Test Kom.', 4, 2),
-    ('4', 'test Kom', 5, 2),
-    ('1', 'test Kom', 5, 3),
-    ('4', 'test Kom', 6, 4),
-    ('2', 'test Kom', 6, 1);;
-
-INSERT INTO serwis(pozycja_zamowienia_id, opis_usterki, status, ilosc)
-VALUES
-    (1,'Nie działa przycisk nr 1.', 'nowe', 1),
-    (3,'Bateria do wymiany.','realizowane',1);
+    ('5', 'Ciastkowy potwór', 'Dobry produkt. Moje życie uległo zmianie od kiedy kupiłem ten produkt. Polecam', 2, 1),
+    ('3', 'Ciastkowy potwór', 'Apple not gut.', 1, 2),
+    ('4', 'Roman', 'Ok', 2, 2),
+    ('1', 'Andrzej', 'polecam', 2, 3),
+    ('4', 'Butter', 'kiepsko', 2, 4),
+    ('2', 'Luks', 'Luks', 1, 1),
+    ('5', 'Luks', 'Test Kom 1', 4, 1),
+    ('3', 'Luks', 'Test Kom 2', 4, 2),
+    ('4', 'Luks', 'test Kom 3', 5, 2),
+    ('1', 'Luks', 'test Kom 4', 5, 3),
+    ('4', 'Orangutan', 'test Kom 5', 6, 4),
+    ('2', 'Luks', 'test Kom 6', 6, 1);
 
 UPDATE zamowienie
-SET data_zrealizowania = now()
-WHERE id=1 OR id=2;
+SET status = 'zrealizowane'
+WHERE id=1 OR id=3;
+
+INSERT INTO serwis(pozycja_zamowienia_id, opis_usterki, status)
+VALUES
+    (1, 'Nie działa przycisk nr 1.', 'nowe'),
+    (4, 'Bateria do wymiany.','realizowane');

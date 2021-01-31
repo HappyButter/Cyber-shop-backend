@@ -14,21 +14,23 @@ class AuthController {
                 INSERT INTO uzytkownik(imie, nazwisko, email, telefon, haslo)
                 VALUES 
                     (${name}, ${surname}, ${email}, ${phoneNumber}, ${password})
-                RETURNING id, imie;
+                RETURNING *;
             `);
 
-            const newUser = { 
-                id : user.rows[0].id,
-                name : user.rows[0].imie,
-                surname : user.rows[0].nazwisko,
-                phoneNumber : user.rows[0].telefon
+            if(user.rows.length !== 0){
+                const newUser = { 
+                    id : user.rows[0].id,
+                    name : user.rows[0].imie,
+                    surname : user.rows[0].nazwisko,
+                    phoneNumber : user.rows[0].telefon
+                }
+    
+                res.status(201).json(newUser);
+            }else{
+                res.status(400).send("Coś poszło nie tak");
             }
-
-            res.status(201).json(newUser);
-
         }catch(err){
-            console.log(err);
-            return res.status(400).json({ error: err.detail.toString() });
+            return res.status(409).send("Użytkownik o podanym adresie email już istnieje");
         }
     }
 

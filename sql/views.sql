@@ -1,11 +1,6 @@
--- clear products names for search bar
-DROP VIEW IF EXISTS wszystkie_nazwy_produktow;
-
-CREATE VIEW wszystkie_nazwy_produktow AS
-    SELECT nazwa FROM produkt;
-
-
--- products in service
+-- wyświetl wszystkie informacje o produktach, które są lub były w serwisie
+-- wraz z informacją o tytule zamówienia oraz stanem magazynowym produktu - 
+-- - tak by pracownik mógł ocenić czy może wysłać nowy produkt w zastępstwie
 DROP VIEW IF EXISTS produkty_w_serwisie;
 
 CREATE VIEW produkty_w_serwisie AS
@@ -31,7 +26,7 @@ CREATE VIEW produkty_w_serwisie AS
     ON ppzz.id_pozycja_zamowienia = s.pozycja_zamowienia_id;
 
 
--- product full info
+-- pełna informacja o produkcie do zarządzania nim
 DROP VIEW IF EXISTS produkt_pelne_info;
 
 CREATE VIEW produkt_pelne_info AS
@@ -39,7 +34,9 @@ CREATE VIEW produkt_pelne_info AS
     FROM produkt p LEFT JOIN kategoria_produktu kp
         ON kp.id=p.kategoria;
 
--- product with profit margin calculated
+
+-- informacja o produkcie dostępna dla zwyczajnego klienta
+-- wraz z wyliczoną marżą sklepu
 DROP VIEW IF EXISTS produkt_pelne_info_z_marza;
 
 CREATE VIEW produkt_pelne_info_z_marza AS
@@ -60,7 +57,7 @@ CREATE VIEW produkt_pelne_info_z_marza AS
     WHERE stan_magazynu>0;
 
 
--- 6 best rated products for the main page
+-- 6 najlepiej ocenianych produktów wyświetlanych na stronie głównej serwisu
 DROP VIEW IF EXISTS rekomendowane;
 
 CREATE VIEW rekomendowane AS
@@ -80,9 +77,8 @@ CREATE VIEW rekomendowane AS
     ORDER BY srednia_ocena DESC LIMIT 6;
 
 
--- order full info
+-- pełna informacja o zamówieniu
 DROP VIEW IF EXISTS zamowienie_pelne_info;
-
 
 CREATE VIEW zamowienie_pelne_info AS
     SELECT
@@ -116,9 +112,8 @@ CREATE VIEW zamowienie_pelne_info AS
         ORDER BY z.data_utworzenia DESC;
 
 
-
--- ordered products
-drop view zamowione_produkty;
+-- lista produktów w zamówieniu
+DROP VIEW IF EXISTS zamowione_produkty;
 
 CREATE VIEW zamowione_produkty AS
     SELECT p.nazwa as nazwa_produktu,
@@ -131,8 +126,8 @@ CREATE VIEW zamowione_produkty AS
         JOIN produkt p ON pz.produkt_id = p.id;
 
 
-
--- shop finances balance
+-- bilans finansowy sklepu
+DROP VIEW IF EXISTS saldo_sklepu;
 CREATE VIEW saldo_sklepu AS
     SELECT COUNT(*),
            ROUND(sum(koszt_produktow),2)

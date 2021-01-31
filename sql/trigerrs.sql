@@ -1,4 +1,5 @@
--- update promo price --
+-- aktualizacja ceny promocyjnej produktu
+-- wraz z zabezpieczeniem przed ujemnym stanem magazynowym
 CREATE OR REPLACE FUNCTION zmodyfikuj_promo_cena()
 RETURNS trigger AS $$
 DECLARE
@@ -27,7 +28,7 @@ FOR EACH ROW
 EXECUTE PROCEDURE zmodyfikuj_promo_cena();
 
 
--- update product rating --
+-- przelicza średnią ocenę produktu
 CREATE OR REPLACE FUNCTION zmodyfikuj_srednia_ocena()
 RETURNS trigger AS $$
 DECLARE
@@ -48,12 +49,11 @@ CREATE TRIGGER srednia_ocena AFTER INSERT OR UPDATE OR DELETE ON opinia
 FOR EACH ROW EXECUTE PROCEDURE zmodyfikuj_srednia_ocena();
 
 
--- handle promo updates --
--- walidacja wartości zniżki promocyjnej
+-- walidacja wartości zniżki promocyjnej.
+-- Poprawny zakres: (0.00, 0.99) 
 CREATE OR REPLACE FUNCTION promocja_update_cena()
 RETURNS trigger AS $$
 BEGIN
-
     IF NEW.znizka < 0.0 OR NEW.znizka > 0.99 THEN
         IF (TG_OP = 'UPDATE') THEN
             RETURN OLD;
@@ -71,8 +71,8 @@ BEFORE INSERT OR UPDATE ON promocja
 FOR EACH ROW
 EXECUTE PROCEDURE promocja_update_cena();
 
--- update promo price
--- zmiana zniżki promocyjnej odświeża ceny promocyjne produktów
+
+-- aktualizacja cen promocyjnych produktu przy zmianie wartości zniżki promocji
 CREATE OR REPLACE FUNCTION promocja_update()
 RETURNS trigger AS $$
 BEGIN
@@ -86,8 +86,7 @@ FOR EACH ROW
 EXECUTE PROCEDURE promocja_update();
 
 
--- delete promo
--- usunięcie promocji odświeża ceny promocyjne produktów
+-- aktualizacja cen promocyjnych produktu przy usunięciu promocji
 CREATE OR REPLACE FUNCTION promocja_delete()
 RETURNS trigger AS $$
 BEGIN
@@ -101,8 +100,7 @@ FOR EACH ROW
 EXECUTE PROCEDURE promocja_delete();
 
 
--- insert product ininto service controll
----- protecting from inserting product out of warranty
+-- zabezpieczenie przed wprowadzeniem do serwisu produktu, którego okres gwarancyjny wygasł 
 CREATE OR REPLACE FUNCTION sprawdz_aktywnosc_gwarancji()
 RETURNS trigger AS $$
 DECLARE
@@ -124,7 +122,8 @@ CREATE TRIGGER sprawdz_aktywnosc_gwarancji BEFORE INSERT ON serwis
 FOR EACH ROW
 EXECUTE PROCEDURE sprawdz_aktywnosc_gwarancji();
 
--- protect from inserting to many produckts to service from one order
+
+-- zabezpieczenie przed wprowadzniem zbyt dużej ilości produktów z danego zamówienia do serwisu
 CREATE OR REPLACE FUNCTION sprawdz_ilosc_produktow_w_serwisie()
 RETURNS trigger AS $$
 DECLARE
@@ -147,7 +146,8 @@ FOR EACH ROW
 EXECUTE PROCEDURE sprawdz_ilosc_produktow_w_serwisie();
 
 
--- update fulfilment date after order status modify
+-- automatyczne wypełnienie daty zrealizowania zamówienia przy zmianie statusu zamówienia na 'zrealizowane'
+-- lub jej usunięcie w przypadku innego wprowadzanego statusu zamówienia
 CREATE OR REPLACE FUNCTION aktualizuj_data_zrealizowania()
 RETURNS trigger AS $$
 BEGIN
@@ -165,4 +165,3 @@ BEFORE UPDATE ON zamowienie
 FOR EACH ROW
 WHEN (OLD.status IS DISTINCT FROM NEW.status)
 EXECUTE PROCEDURE aktualizuj_data_zrealizowania();
-
